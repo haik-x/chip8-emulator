@@ -8,7 +8,7 @@
 #define WINDOW_SCALING 10
 #define GENERAL_PURPOSE_REGISTERS 16
 #define STACK_DEPTH 16
-
+#define TOTAL_KEYS 16
 
 
 #endif

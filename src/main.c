@@ -1,17 +1,18 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include "SDL2/SDL.h"
 #include "chip8.h"
+#include "keyboard.h"
+
+const char key_map[TOTAL_KEYS] = {
+    SDLK_0, SDLK_1, SDLK_2, SDLK_3, SDLK_4, SDLK_5,
+    SDLK_6, SDLK_7, SDLK_8, SDLK_9, SDLK_a, SDLK_b,
+    SDLK_c, SDLK_d, SDLK_e, SDLK_f
+};
 
 int main(int argc, char **argv)
 {
     struct chip8 chip8;
-    chip8.registers.SP = 0;
-    
-    stack_push(&chip8, 0xff);
-    stack_push(&chip8, 0xaa);
-
-    printf("%x\n", stack_pop(&chip8));
-    printf("%x\n", stack_pop(&chip8));
     
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_Window *window = SDL_CreateWindow(
@@ -27,10 +28,30 @@ int main(int argc, char **argv)
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
-            {
-                goto out;
+            switch(event.type){
+                case SDL_QUIT:
+                    goto out;
+                break;
+                case SDL_KEYDOWN:
+                {
+                    char key = event.key.keysym.sym;
+                    char virtual_key = keyboard_map(key_map, key);
+                    if(virtual_key != -1){
+                        key_down(&chip8.keyboard, virtual_key);
+                    }
+                } 
+                break;
+                case SDL_KEYUP:
+                {
+                    char key = event.key.keysym.sym;
+                    char virtual_key = keyboard_map(key_map, key);
+                    if(virtual_key != -1){
+                        key_up(&chip8.keyboard, virtual_key);
+                    }
+                } 
+                break;
             }
+            
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
